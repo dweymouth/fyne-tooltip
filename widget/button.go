@@ -6,15 +6,18 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// Button widget has a text label and triggers an event func when clicked
 type Button struct {
 	widget.Button
 	ToolTipWidgetExtend
 }
 
+// NewButton creates a new button widget with the set label and tap handler
 func NewButton(text string, onTapped func()) *Button {
 	return NewButtonWithIcon(text, nil, onTapped)
 }
 
+// NewButtonWithIcon creates a new button widget with the specified label, themed icon and tap handler
 func NewButtonWithIcon(text string, icon fyne.Resource, onTapped func()) *Button {
 	b := &Button{
 		Button: widget.Button{

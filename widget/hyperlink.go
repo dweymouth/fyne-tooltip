@@ -8,6 +8,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// Hyperlink widget is a text component with appropriate padding and layout.
+// When clicked, the default web browser should open with a URL
 type Hyperlink struct {
 	widget.Hyperlink
 	ToolTipWidgetExtend
@@ -35,7 +37,7 @@ func NewHyperlinkWithStyle(text string, url *url.URL, alignment fyne.TextAlign, 
 
 func (l *Hyperlink) ExtendBaseWidget(wid fyne.Widget) {
 	l.ExtendToolTipWidget(wid)
-	l.Hyperlink.ExtendBaseWidget(l)
+	l.Hyperlink.ExtendBaseWidget(wid)
 }
 
 func (l *Hyperlink) MouseIn(e *desktop.MouseEvent) {

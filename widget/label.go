@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// Label widget is a label component with appropriate padding and layout.
 type Label struct {
 	widget.Label
 	ToolTipWidgetExtend
@@ -40,5 +41,5 @@ func NewLabelWithStyle(text string, alignment fyne.TextAlign, style fyne.TextSty
 
 func (l *Label) ExtendBaseWidget(wid fyne.Widget) {
 	l.ExtendToolTipWidget(wid)
-	l.Label.ExtendBaseWidget(l)
+	l.Label.ExtendBaseWidget(wid)
 }

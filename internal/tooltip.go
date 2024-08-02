@@ -30,6 +30,8 @@ func NewToolTip(text string) *ToolTip {
 }
 
 func (t *ToolTip) MinSize() fyne.Size {
+	// zero so that ToolTip won't force a PopUp or other overlay to a larger size
+	// TextMinSize returns the actual minimum size for rendering
 	return fyne.NewSize(0, 0)
 }
 

@@ -72,10 +72,14 @@ type ToolTipWidgetExtend struct {
 }
 
 func (t *ToolTipWidgetExtend) SetToolTip(toolTip string) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
 	t.toolTip = toolTip
 }
 
 func (t *ToolTipWidgetExtend) ToolTip() string {
+	t.lock.Lock()
+	defer t.lock.Unlock()
 	return t.toolTip
 }
 
@@ -87,8 +91,10 @@ func (t *ToolTipWidgetExtend) ExtendToolTipWidget(wid fyne.Widget) {
 func (t *ToolTipWidgetExtend) MouseIn(e *desktop.MouseEvent) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
-	t.absoluteMousePos = e.AbsolutePosition
-	t.setPendingToolTip(t.Obj, t.toolTip)
+	if t.toolTip != "" {
+		t.absoluteMousePos = e.AbsolutePosition
+		t.setPendingToolTip(t.Obj, t.toolTip)
+	}
 }
 
 func (t *ToolTipWidgetExtend) MouseOut() {

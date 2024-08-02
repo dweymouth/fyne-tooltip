@@ -2,7 +2,7 @@
 
 **fyne-tooltip** is an add-on package for Fyne adding tooltip support. It provides a tool tip rendering system, along with drop-in tooltip-enabled extensions of several of the Fyne builtin widgets, as well as an easy means to extend existing widgets to add tool tip support, or creating new tooltip-enabled custom widgets. It aims to be easy and low-friction to integrate into your existing Fyne projects, as well as easy to remove and switch back to Fyne core if and when tooltips are supported natively.
 
-Tool tip widgets implement `desktop.Mousable` to show the tool tips after a short delay on MouseIn, and hide them on MouseOut.
+Tool tip widgets implement `desktop.Hoverable` to show the tool tips after a short delay on MouseIn, and hide them on MouseOut.
 
 ### Enabling tool tips in a window
 
@@ -107,7 +107,7 @@ func (w *ToolTipIcon) ExtendBaseWidget(wid fyne.Widget) {
 }
 ```
 
-If the base widget already implements `desktop.Mouseable`, you must override the Mouseable APIs to call both the parent widget's implementation,
+If the base widget already implements `desktop.Hoverable`, you must override the Hoverable APIs to call both the parent widget's implementation,
 as well as the ToolTipWidgetExtend implementation. For example, for the tooltip-enabled button:
 
 ```go
