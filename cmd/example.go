@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	fynetooltip "github.com/dweymouth/fyne-tooltip"
 	ttwidget "github.com/dweymouth/fyne-tooltip/widget"
@@ -24,8 +25,18 @@ func main() {
 	btnB := ttwidget.NewButton("Show Modal PopUp", nil)
 	btnB.SetToolTip("Show a tooltip-enabled modal PopUp")
 
-	content := container.NewCenter(
-		container.NewHBox(btnA, btnB),
+	lbl := ttwidget.NewLabel("a tooltip-enabled label near bottom")
+	lbl.SetToolTip("Hello, world!")
+	lbl.Alignment = fyne.TextAlignCenter
+
+	content := container.NewStack(
+		container.NewCenter(
+			container.NewHBox(btnA, btnB),
+		),
+		container.NewVBox(
+			layout.NewSpacer(),
+			lbl,
+		),
 	)
 
 	win.SetContent(fynetooltip.AddWindowToolTipLayer(content, win.Canvas()))

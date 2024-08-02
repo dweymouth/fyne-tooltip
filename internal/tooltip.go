@@ -33,6 +33,12 @@ func (t *ToolTip) MinSize() fyne.Size {
 	return fyne.NewSize(0, 0)
 }
 
+func (t *ToolTip) Resize(size fyne.Size) {
+	t.updateRichText()
+	t.richtext.Resize(size)
+	t.BaseWidget.Resize(size)
+}
+
 func (t *ToolTip) TextMinSize() fyne.Size {
 	t.updateRichText()
 	return t.richtext.MinSize().Subtract(
@@ -40,9 +46,18 @@ func (t *ToolTip) TextMinSize() fyne.Size {
 		Add(fyne.NewSquareSize(2))
 }
 
+func (t *ToolTip) NonWrappingTextWidth() float32 {
+	ToolTipTextStyleMutex.Lock()
+	style := ToolTipTextStyle
+	ToolTipTextStyleMutex.Unlock()
+	th := t.Theme()
+	return fyne.MeasureText(t.Text, th.Size(style.SizeName), style.TextStyle).Width + th.Size(theme.SizeNameInnerPadding)*2
+}
+
 func (t *ToolTip) updateRichText() {
 	if t.richtext == nil {
 		t.richtext = widget.NewRichTextWithText(t.Text)
+		t.richtext.Wrapping = fyne.TextWrapWord
 	}
 	ToolTipTextStyleMutex.Lock()
 	style := ToolTipTextStyle
@@ -63,7 +78,7 @@ func (r *toolTipRenderer) Layout(s fyne.Size) {
 	r.backgroundRect.Move(fyne.NewPos(0, 0))
 	innerPad := r.toolTip.Theme().Size(theme.SizeNameInnerPadding)
 	r.toolTip.richtext.Resize(s)
-	r.toolTip.richtext.Move(fyne.NewPos(1-innerPad, -innerPad))
+	r.toolTip.richtext.Move(fyne.NewPos(0, -innerPad))
 }
 
 func (r *toolTipRenderer) MinSize() fyne.Size {

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -60,12 +61,11 @@ func ShowToolTipAtMousePosition(canvas fyne.Canvas, pos fyne.Position, text stri
 
 	t := NewToolTip(text)
 	tl.Container.Objects = []fyne.CanvasObject{t}
-	t.Resize(t.TextMinSize())
 	if pop, ok := overlay.(*widget.PopUp); ok && pop != nil {
 		pos = pos.Subtract(pop.Content.Position())
 	}
 
-	t.Move(pos)
+	sizeAndPositionToolTip(pos, t, canvas)
 	tl.Container.Refresh()
 	return handle
 }
@@ -96,4 +96,34 @@ func findToolTipLayer(handle *ToolTipHandle) *ToolTipLayer {
 		}
 	}
 	return tl
+}
+
+const (
+	maxToolTipWidth = 600
+	belowMouseDist  = 16
+	aboveMouseDist  = 8
+)
+
+func sizeAndPositionToolTip(anchorPos fyne.Position, t *ToolTip, canvas fyne.Canvas) {
+	canvasSize := canvas.Size()
+	canvasPad := theme.Padding()
+
+	// calculate width of tooltip
+	w := fyne.Min(t.NonWrappingTextWidth(), fyne.Min(canvasSize.Width-canvasPad*2, maxToolTipWidth))
+	t.Resize(fyne.NewSize(w, 1)) // set up to get min height with wrapping at width w
+	t.Resize(fyne.NewSize(w, t.TextMinSize().Height))
+
+	// if would overflow the right edge of the window, move back to the left
+	if rightEdge := anchorPos.X + w; rightEdge > canvasSize.Width-canvasPad {
+		anchorPos.X -= rightEdge - canvasSize.Width + canvasPad
+	}
+
+	// if would overflow the bottom of the window, move above mouse
+	if anchorPos.Y+t.Size().Height+belowMouseDist > canvasSize.Height-canvasPad {
+		anchorPos.Y -= t.Size().Height + aboveMouseDist
+	} else {
+		anchorPos.Y += belowMouseDist
+	}
+
+	t.Move(anchorPos)
 }
