@@ -115,7 +115,7 @@ func sizeAndPositionToolTip(anchorPos fyne.Position, t *ToolTip, canvas fyne.Can
 
 	// if would overflow the right edge of the window, move back to the left
 	if rightEdge := anchorPos.X + w; rightEdge > canvasSize.Width-canvasPad {
-		anchorPos.X -= rightEdge - canvasSize.Width + canvasPad
+		anchorPos.X -= rightEdge - canvasSize.Width + canvasPad*2
 	}
 
 	// if would overflow the bottom of the window, move above mouse

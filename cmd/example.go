@@ -23,10 +23,10 @@ func main() {
 	btnA.SetToolTip("Show a tooltip-enabled PopUp")
 
 	btnB := ttwidget.NewButton("Show Modal PopUp", nil)
-	btnB.SetToolTip("Show a tooltip-enabled modal PopUp")
+	btnB.SetToolTip("Show a tooltip-enabled modal PopUp. This tool tip text is so very very very long that it must wrap to fit on the screen.")
 
 	lbl := ttwidget.NewLabel("a tooltip-enabled label near bottom")
-	lbl.SetToolTip("Hello, world!")
+	lbl.SetToolTip("Hello, world! Tooltips are great!")
 	lbl.Alignment = fyne.TextAlignCenter
 
 	content := container.NewStack(
@@ -47,10 +47,21 @@ func main() {
 var reusablePopUp *widget.PopUp
 
 func showPopUp(canvas fyne.Canvas, pos fyne.Position) {
+	hide := func() {
+		reusablePopUp.Hide()
+	}
 	if reusablePopUp == nil {
-		btn := ttwidget.NewButton("hello", nil)
-		btn.SetToolTip("world yeah")
-		reusablePopUp = widget.NewPopUp(container.NewPadded(btn), canvas)
+		btnA := ttwidget.NewButton("hello", hide)
+		btnA.SetToolTip("world")
+		btnB := ttwidget.NewButton("world", hide)
+		btnB.SetToolTip("hello")
+		title := widget.NewLabel("My popup")
+		title.Alignment = fyne.TextAlignCenter
+		content := container.NewVBox(
+			title,
+			container.NewHBox(btnA, btnB),
+		)
+		reusablePopUp = widget.NewPopUp(container.NewPadded(content), canvas)
 
 		// a pop up that will be reused only needs a call to
 		// AddPopUpToolTipLayer during setup

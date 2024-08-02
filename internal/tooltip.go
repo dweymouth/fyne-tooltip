@@ -43,7 +43,7 @@ func (t *ToolTip) TextMinSize() fyne.Size {
 	t.updateRichText()
 	return t.richtext.MinSize().Subtract(
 		fyne.NewSquareSize(2 * t.Theme().Size(theme.SizeNameInnerPadding))).
-		Add(fyne.NewSquareSize(2))
+		Add(fyne.NewSize(2, 8))
 }
 
 func (t *ToolTip) NonWrappingTextWidth() float32 {
@@ -78,7 +78,7 @@ func (r *toolTipRenderer) Layout(s fyne.Size) {
 	r.backgroundRect.Move(fyne.NewPos(0, 0))
 	innerPad := r.toolTip.Theme().Size(theme.SizeNameInnerPadding)
 	r.toolTip.richtext.Resize(s)
-	r.toolTip.richtext.Move(fyne.NewPos(0, -innerPad))
+	r.toolTip.richtext.Move(fyne.NewPos(0, -innerPad+3))
 }
 
 func (r *toolTipRenderer) MinSize() fyne.Size {
