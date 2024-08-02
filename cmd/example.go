@@ -39,8 +39,10 @@ func main() {
 		),
 	)
 
+	win.SetMainMenu(fyne.NewMainMenu(fyne.NewMenu("File")))
 	win.SetContent(fynetooltip.AddWindowToolTipLayer(content, win.Canvas()))
 	win.Resize(fyne.NewSize(400, 300))
+
 	win.ShowAndRun()
 }
 
@@ -54,7 +56,7 @@ func showPopUp(canvas fyne.Canvas, pos fyne.Position) {
 		btnA := ttwidget.NewButton("hello", hide)
 		btnA.SetToolTip("world")
 		btnB := ttwidget.NewButton("world", hide)
-		btnB.SetToolTip("hello")
+		btnB.SetToolTip("hello - this is also a bit longer text")
 		title := widget.NewLabel("My popup")
 		title.Alignment = fyne.TextAlignCenter
 		content := container.NewVBox(

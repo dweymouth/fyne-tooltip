@@ -61,11 +61,15 @@ func ShowToolTipAtMousePosition(canvas fyne.Canvas, pos fyne.Position, text stri
 
 	t := NewToolTip(text)
 	tl.Container.Objects = []fyne.CanvasObject{t}
+
+	var zeroPos fyne.Position
 	if pop, ok := overlay.(*widget.PopUp); ok && pop != nil {
-		pos = pos.Subtract(pop.Content.Position())
+		zeroPos = pop.Content.Position()
+	} else {
+		zeroPos = fyne.CurrentApp().Driver().AbsolutePositionForObject(&tl.Container)
 	}
 
-	sizeAndPositionToolTip(pos, t, canvas)
+	sizeAndPositionToolTip(zeroPos, pos.Subtract(zeroPos), t, canvas)
 	tl.Container.Refresh()
 	return handle
 }
@@ -104,7 +108,7 @@ const (
 	aboveMouseDist  = 8
 )
 
-func sizeAndPositionToolTip(anchorPos fyne.Position, t *ToolTip, canvas fyne.Canvas) {
+func sizeAndPositionToolTip(zeroPos, relPos fyne.Position, t *ToolTip, canvas fyne.Canvas) {
 	canvasSize := canvas.Size()
 	canvasPad := theme.Padding()
 
@@ -114,16 +118,16 @@ func sizeAndPositionToolTip(anchorPos fyne.Position, t *ToolTip, canvas fyne.Can
 	t.Resize(fyne.NewSize(w, t.TextMinSize().Height))
 
 	// if would overflow the right edge of the window, move back to the left
-	if rightEdge := anchorPos.X + w; rightEdge > canvasSize.Width-canvasPad {
-		anchorPos.X -= rightEdge - canvasSize.Width + canvasPad*2
+	if rightEdge := relPos.X + zeroPos.X + w; rightEdge > canvasSize.Width-canvasPad {
+		relPos.X -= rightEdge - canvasSize.Width + canvasPad
 	}
 
 	// if would overflow the bottom of the window, move above mouse
-	if anchorPos.Y+t.Size().Height+belowMouseDist > canvasSize.Height-canvasPad {
-		anchorPos.Y -= t.Size().Height + aboveMouseDist
+	if bottomEdge := relPos.Y + zeroPos.Y + t.Size().Height + belowMouseDist; bottomEdge > canvasSize.Height-canvasPad {
+		relPos.Y -= t.Size().Height + aboveMouseDist
 	} else {
-		anchorPos.Y += belowMouseDist
+		relPos.Y += belowMouseDist
 	}
 
-	t.Move(anchorPos)
+	t.Move(relPos)
 }
