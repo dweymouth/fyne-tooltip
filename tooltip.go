@@ -23,3 +23,15 @@ func AddPopUpToolTipLayer(p *widget.PopUp) {
 func DestroyPopUpToolTipLayer(p *widget.PopUp) {
 	internal.DestroyToolTipLayerForPopup(p)
 }
+
+func SetToolTipTextStyle(style fyne.TextStyle) {
+	internal.ToolTipTextStyleMutex.Lock()
+	defer internal.ToolTipTextStyleMutex.Unlock()
+	internal.ToolTipTextStyle.TextStyle = style
+}
+
+func SetToolTipTextSizeName(sizeName fyne.ThemeSizeName) {
+	internal.ToolTipTextStyleMutex.Lock()
+	defer internal.ToolTipTextStyleMutex.Unlock()
+	internal.ToolTipTextStyle.SizeName = sizeName
+}

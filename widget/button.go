@@ -23,8 +23,13 @@ func NewButtonWithIcon(text string, icon fyne.Resource, onTapped func()) *Button
 			OnTapped: onTapped,
 		},
 	}
-	b.ExtendToolTipWidget(b)
+	b.ExtendBaseWidget(b)
 	return b
+}
+
+func (b *Button) ExtendBaseWidget(wid fyne.Widget) {
+	b.ExtendToolTipWidget(wid)
+	b.Button.ExtendBaseWidget(wid)
 }
 
 func (b *Button) MouseIn(e *desktop.MouseEvent) {

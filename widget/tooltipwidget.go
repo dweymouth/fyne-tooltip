@@ -11,10 +11,11 @@ import (
 	"github.com/dweymouth/fyne-tooltip/internal"
 )
 
-const toolTipDelay = 500 * time.Millisecond
+const toolTipDelay = 750 * time.Millisecond
 
 type toolTipContext struct {
 	lock                 sync.Mutex
+	toolTipHandle        *internal.ToolTipHandle
 	absoluteMousePos     fyne.Position
 	pendingToolTipCtx    context.Context
 	pendingToolTipCancel context.CancelFunc
@@ -75,9 +76,6 @@ func (t *ToolTipWidgetExtend) ToolTip() string {
 
 func (t *ToolTipWidgetExtend) ExtendToolTipWidget(wid fyne.Widget) {
 	t.Obj = wid
-	if base, ok := wid.(interface{ ExtendBaseWidget(fyne.Widget) }); ok {
-		base.ExtendBaseWidget(wid)
-	}
 }
 
 func (t *ToolTipWidgetExtend) MouseIn(e *desktop.MouseEvent) {
@@ -110,11 +108,11 @@ func (t *toolTipContext) setPendingToolTip(wid fyne.CanvasObject, toolTipText st
 			return
 		default:
 			t.lock.Lock()
+			defer t.lock.Unlock()
 			t.cancelToolTip() // don't leak ctx resources
 			pos := t.absoluteMousePos
-			t.lock.Unlock()
 			canvas := fyne.CurrentApp().Driver().CanvasForObject(wid)
-			internal.ShowToolTipAtMousePosition(canvas, pos, toolTipText)
+			t.toolTipHandle = internal.ShowToolTipAtMousePosition(canvas, pos, toolTipText)
 		}
 	}()
 }
@@ -124,5 +122,9 @@ func (t *toolTipContext) cancelToolTip() {
 		t.pendingToolTipCancel()
 		t.pendingToolTipCancel = nil
 		t.pendingToolTipCtx = nil
+	}
+	if t.toolTipHandle != nil {
+		internal.HideToolTip(t.toolTipHandle)
+		t.toolTipHandle = nil
 	}
 }
