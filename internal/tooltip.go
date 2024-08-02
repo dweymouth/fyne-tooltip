@@ -5,9 +5,9 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dweymouth/fyne-tooltip/internal/shadow"
 )
 
 var (
@@ -19,6 +19,8 @@ type ToolTip struct {
 	widget.BaseWidget
 
 	Text string
+
+	richtext *widget.RichText
 }
 
 func NewToolTip(text string) *ToolTip {
@@ -32,20 +34,59 @@ func (t *ToolTip) MinSize() fyne.Size {
 }
 
 func (t *ToolTip) TextMinSize() fyne.Size {
-	return t.BaseWidget.MinSize()
+	t.updateRichText()
+	return t.richtext.MinSize().Subtract(
+		fyne.NewSquareSize(2 * t.Theme().Size(theme.SizeNameInnerPadding))).
+		Add(fyne.NewSquareSize(2))
 }
 
-func (t *ToolTip) CreateRenderer() fyne.WidgetRenderer {
-	variant := fyne.CurrentApp().Settings().ThemeVariant()
+func (t *ToolTip) updateRichText() {
+	if t.richtext == nil {
+		t.richtext = widget.NewRichTextWithText(t.Text)
+	}
 	ToolTipTextStyleMutex.Lock()
 	style := ToolTipTextStyle
 	ToolTipTextStyleMutex.Unlock()
-	rt := widget.NewRichTextWithText(t.Text)
-	rt.Segments[0].(*widget.TextSegment).Style = style
-	return widget.NewSimpleRenderer(
-		container.NewStack(
-			canvas.NewRectangle(t.Theme().Color(theme.ColorNameOverlayBackground, variant)),
-			rt,
-		),
-	)
+	t.richtext.Segments[0].(*widget.TextSegment).Text = t.Text
+	t.richtext.Segments[0].(*widget.TextSegment).Style = style
+}
+
+type toolTipRenderer struct {
+	*shadow.ShadowingRenderer
+	toolTip        *ToolTip
+	backgroundRect canvas.Rectangle
+}
+
+func (r *toolTipRenderer) Layout(s fyne.Size) {
+	r.LayoutShadow(s, fyne.NewPos(0, 0))
+	r.backgroundRect.Resize(s)
+	r.backgroundRect.Move(fyne.NewPos(0, 0))
+	innerPad := r.toolTip.Theme().Size(theme.SizeNameInnerPadding)
+	r.toolTip.richtext.Resize(s)
+	r.toolTip.richtext.Move(fyne.NewPos(1-innerPad, -innerPad))
+}
+
+func (r *toolTipRenderer) MinSize() fyne.Size {
+	return r.toolTip.TextMinSize()
+}
+
+func (r *toolTipRenderer) Refresh() {
+	r.ShadowingRenderer.RefreshShadow()
+	th := r.toolTip.Theme()
+	variant := fyne.CurrentApp().Settings().ThemeVariant()
+	r.backgroundRect.FillColor = th.Color(theme.ColorNameOverlayBackground, variant)
+	r.backgroundRect.StrokeColor = th.Color(theme.ColorNameInputBorder, variant)
+	r.backgroundRect.StrokeWidth = th.Size(theme.SizeNameInputBorder)
+	r.backgroundRect.Refresh()
+	r.toolTip.updateRichText()
+	r.toolTip.richtext.Refresh()
+
+	canvas.Refresh(r.toolTip)
+}
+
+func (t *ToolTip) CreateRenderer() fyne.WidgetRenderer {
+	t.updateRichText()
+	r := &toolTipRenderer{toolTip: t}
+	r.ShadowingRenderer = shadow.NewShadowingRenderer([]fyne.CanvasObject{&r.backgroundRect, t.richtext}, shadow.ToolTipLevel)
+	return r
 }
