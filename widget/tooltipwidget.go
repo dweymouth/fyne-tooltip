@@ -22,6 +22,8 @@ type toolTipContext struct {
 }
 
 // ToolTipWidget is a base struct for building new tool tip supporting widgets.
+// Inherit from this struct instead of from `widget.BaseWidget` to automatically
+// add tool tip support to your widget.
 type ToolTipWidget struct {
 	widget.BaseWidget
 	toolTipContext
@@ -57,6 +59,9 @@ func (t *ToolTipWidget) MouseMoved(e *desktop.MouseEvent) {
 }
 
 // ToolTipWidgetExtend is a struct for extending existing widgets for tool tip support.
+// Use this to extend existing widgets for tool tip support. When creating an extended
+// widget with ToolTipWidgetExtend you must override ExtendBaseWidget to call both the
+// ExtendBaseWidget implementation of the parent widget, and ExtendToolTipWidget.
 type ToolTipWidgetExtend struct {
 	toolTipContext
 
@@ -74,6 +79,7 @@ func (t *ToolTipWidgetExtend) ToolTip() string {
 	return t.toolTip
 }
 
+// ExtendToolTipWidget sets up a tool tip extended widget.
 func (t *ToolTipWidgetExtend) ExtendToolTipWidget(wid fyne.Widget) {
 	t.Obj = wid
 }
