@@ -133,7 +133,7 @@ func (b *Button) MouseMoved(e *desktop.MouseEvent) {
 
 ## Example app
 
-Here is a complete example app that shows how to use **fyne-tooltips**:
+Below is a complete example app that shows how to use **fyne-tooltips**. The source code of the example app shown in the video is also available at `cmd/example.go`.
 
 ```go
 package main
