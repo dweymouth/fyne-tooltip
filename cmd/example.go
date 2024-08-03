@@ -22,7 +22,9 @@ func main() {
 	})
 	btnA.SetToolTip("Show a tooltip-enabled PopUp")
 
-	btnB := ttwidget.NewButton("Show Modal PopUp", nil)
+	btnB := ttwidget.NewButton("Show Modal PopUp", func() {
+		showModalPopUp(fyne.CurrentApp().Driver().CanvasForObject(btnA))
+	})
 	btnB.SetToolTip("Show a tooltip-enabled modal PopUp. This tool tip text is so very very very long that it must wrap to fit on the screen.")
 
 	lbl := ttwidget.NewLabel("a tooltip-enabled label near bottom")
@@ -71,4 +73,26 @@ func showPopUp(canvas fyne.Canvas, pos fyne.Position) {
 	}
 
 	reusablePopUp.ShowAtPosition(pos)
+}
+
+func showModalPopUp(canvas fyne.Canvas) {
+	var pop *widget.PopUp
+	hide := func() {
+		pop.Hide()
+		// release memory resources when the pop up will no longer be shown
+		fynetooltip.DestroyPopUpToolTipLayer(pop)
+	}
+	btnA := ttwidget.NewButton("hello", hide)
+	btnA.SetToolTip("world")
+	btnB := ttwidget.NewButton("world", hide)
+	btnB.SetToolTip("hello - this is also a bit longer text")
+	title := widget.NewLabel("My popup")
+	title.Alignment = fyne.TextAlignCenter
+	content := container.NewVBox(
+		title,
+		container.NewHBox(btnA, btnB),
+	)
+	pop = widget.NewModalPopUp(content, canvas)
+	fynetooltip.AddPopUpToolTipLayer(pop)
+	pop.Show()
 }

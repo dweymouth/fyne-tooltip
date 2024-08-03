@@ -72,7 +72,7 @@ func ShowToolTipAtMousePosition(canvas fyne.Canvas, pos fyne.Position, text stri
 	lastToolTipShownUnixMilli = time.Now().UnixMilli()
 	overlay := canvas.Overlays().Top()
 	handle := &ToolTipHandle{canvas: canvas, overlay: overlay}
-	tl := findToolTipLayer(handle)
+	tl := findToolTipLayer(handle, true)
 	if tl == nil {
 		return nil
 	}
@@ -96,7 +96,7 @@ func HideToolTip(handle *ToolTipHandle) {
 	if handle == nil {
 		return
 	}
-	tl := findToolTipLayer(handle)
+	tl := findToolTipLayer(handle, false)
 	if tl == nil {
 		return
 	}
@@ -104,16 +104,20 @@ func HideToolTip(handle *ToolTipHandle) {
 	tl.Container.Refresh()
 }
 
-func findToolTipLayer(handle *ToolTipHandle) *ToolTipLayer {
+func findToolTipLayer(handle *ToolTipHandle, logErr bool) *ToolTipLayer {
 	tl := toolTipLayers[handle.canvas]
 	if tl == nil {
-		fyne.LogError("", errors.New("no tool tip layer created for window canvas"))
+		if logErr {
+			fyne.LogError("", errors.New("no tool tip layer created for window canvas"))
+		}
 		return nil
 	}
 	if handle.overlay != nil {
 		tl = tl.overlays[handle.overlay]
 		if tl == nil {
-			fyne.LogError("", errors.New("no tool tip layer created for current overlay"))
+			if logErr {
+				fyne.LogError("", errors.New("no tool tip layer created for current overlay"))
+			}
 			return nil
 		}
 	}
