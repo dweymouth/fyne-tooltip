@@ -1,5 +1,10 @@
 # fyne-tooltip
 
+
+
+https://github.com/user-attachments/assets/e9a2b9dd-9d6c-49f2-9c3a-b896fec4609d
+
+
 **fyne-tooltip** is an add-on package for Fyne adding tooltip support. It provides a tool tip rendering system, along with drop-in tooltip-enabled extensions of several of the Fyne builtin widgets, as well as an easy means to extend existing widgets to add tool tip support, or creating new tooltip-enabled custom widgets. It aims to be easy and low-friction to integrate into your existing Fyne projects, as well as easy to remove and switch back to Fyne core if and when tooltips are supported natively.
 
 Tool tip widgets implement `desktop.Hoverable` to show the tool tips after a short delay on MouseIn, and hide them on MouseOut.
