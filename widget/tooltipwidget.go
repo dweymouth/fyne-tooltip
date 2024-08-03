@@ -11,8 +11,6 @@ import (
 	"github.com/dweymouth/fyne-tooltip/internal"
 )
 
-const toolTipDelay = 750 * time.Millisecond
-
 type toolTipContext struct {
 	lock                 sync.Mutex
 	toolTipHandle        *internal.ToolTipHandle
@@ -114,7 +112,7 @@ func (t *toolTipContext) setPendingToolTip(wid fyne.CanvasObject, toolTipText st
 	t.pendingToolTipCtx, t.pendingToolTipCancel = ctx, cancel
 
 	go func() {
-		<-time.After(toolTipDelay)
+		<-time.After(internal.NextToolTipDelayTime())
 		select {
 		case <-ctx.Done():
 			return

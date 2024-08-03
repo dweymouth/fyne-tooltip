@@ -2,13 +2,30 @@ package internal
 
 import (
 	"errors"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
-var toolTipLayers = make(map[fyne.Canvas]*ToolTipLayer)
+const (
+	initialToolTipDelay             = 750 * time.Millisecond
+	subsequentToolTipDelay          = 300 * time.Millisecond
+	subsequentToolTipDelayValidTime = 1500 * time.Millisecond
+)
+
+var (
+	toolTipLayers             = make(map[fyne.Canvas]*ToolTipLayer)
+	lastToolTipShownUnixMilli int64
+)
+
+func NextToolTipDelayTime() time.Duration {
+	if time.Now().UnixMilli()-lastToolTipShownUnixMilli < subsequentToolTipDelayValidTime.Milliseconds() {
+		return subsequentToolTipDelay
+	}
+	return initialToolTipDelay
+}
 
 type ToolTipHandle struct {
 	canvas  fyne.Canvas
@@ -52,6 +69,7 @@ func DestroyToolTipLayerForPopup(popUp *widget.PopUp) {
 }
 
 func ShowToolTipAtMousePosition(canvas fyne.Canvas, pos fyne.Position, text string) *ToolTipHandle {
+	lastToolTipShownUnixMilli = time.Now().UnixMilli()
 	overlay := canvas.Overlays().Top()
 	handle := &ToolTipHandle{canvas: canvas, overlay: overlay}
 	tl := findToolTipLayer(handle)
