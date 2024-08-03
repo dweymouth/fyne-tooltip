@@ -9,9 +9,9 @@ https://github.com/user-attachments/assets/e9a2b9dd-9d6c-49f2-9c3a-b896fec4609d
 
 Tool tip widgets implement `desktop.Hoverable` to show the tool tips after a short delay on MouseIn, and hide them on MouseOut.
 
-### Enabling tool tips in a window
+## Enabling tool tips in a window
 
-`fyne-tooltip` requires tool tip layers to be created for the tool tips to be rendered into, and provides APIs to do so for windows and pop-ups. It is called when settting the window's content:
+**fyne-tooltip** requires tool tip layers to be created for the tool tips to be rendered into, and provides APIs to do so for windows and pop-ups. It is called when setting the window's content:
 
 ```go
 window.SetContent(fynetooltip.AddWindowToolTipLayer(myContent, window.Canvas()))
@@ -27,7 +27,7 @@ window.SetCloseIntercept(func() {
 })
 ```
 
-### Using built-in tool tip widgets
+## Using built-in tool tip widgets
 
 Drop-in replacements for several built-in Fyne widgets are provided, which have been extended from the base implementation to add tool tip support.
 
@@ -46,9 +46,9 @@ func main() {
 }
 ```
 
-### Enabling tool tips in a PopUp
+## Enabling tool tips in a PopUp
 
-Simiarly to windows, `fyne-tooltip` requires a tool tip layer to be created for pop ups to enable tool tips to be shown.
+Similarly to windows, **fyne-tooltip** requires a tool tip layer to be created for pop ups to enable tool tips to be shown.
 It is called after creating the pop up with content, but before showing it.
 
 ```go
@@ -60,7 +60,7 @@ pop.Show()
 The pop up may be hidden and re-shown. It is only necessary to create the pop up layer once. When the popup is hidden and will not be shown again,
 it is important to call `DestroyPopUpToolTipLayer` to release memory resources associated with the tool tip layer.
 
-### Creating new tool tip widgets
+## Creating new tool tip widgets
 
 To create custom widgets that are tool tip enabled, just extend from the `ToolTipWidget` base struct instead of `BaseWidget`. The widget will automatically
 have a SetToolTip API, and the mouse event hooks added to show and hide the tool tip.
@@ -79,8 +79,7 @@ func NewMyWidget() *MyWidget {
 }
 ```
 
-
-### Extending existing widgets for tool tip support
+## Extending existing widgets for tool tip support
 
 To extend existing widgets with tool tip support, use the `ToolTipWidgetExtend` struct. You must override `ExtendBaseWidget` to call both the
 parent widget's `ExtendBaseWidget`, as well as `ExtendToolTipWidget`
@@ -129,5 +128,35 @@ func (b *Button) MouseOut() {
 func (b *Button) MouseMoved(e *desktop.MouseEvent) {
 	b.ToolTipWidgetExtend.MouseMoved(e)
 	b.Button.MouseMoved(e)
+}
+```
+
+## Example app
+
+Here is a complete example app that shows how to use **fyne-tooltips**:
+
+```go
+package main
+
+import (
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	fynetooltip "github.com/dweymouth/fyne-tooltip"
+	ttwidget "github.com/dweymouth/fyne-tooltip/widget"
+)
+
+func main() {
+	myApp := app.New()
+	myWindow := myApp.NewWindow("Example")
+
+	label := ttwidget.NewLabel("This is a label")
+	label.SetToolTip("This is a tooltip")
+
+	content := container.NewCenter(label)
+	myWindow.SetContent(fynetooltip.AddWindowToolTipLayer(content, myWindow.Canvas()))
+
+	myWindow.Resize(fyne.NewSize(800, 600))
+	myWindow.ShowAndRun()
 }
 ```
