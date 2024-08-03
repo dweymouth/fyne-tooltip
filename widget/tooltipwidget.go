@@ -2,6 +2,7 @@ package widget
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -26,22 +27,38 @@ type ToolTipWidget struct {
 	widget.BaseWidget
 	toolTipContext
 
+	wid     fyne.Widget
 	toolTip string
 }
 
+func (t *ToolTipWidget) ExtendBaseWidget(wid fyne.Widget) {
+	t.wid = wid
+	t.BaseWidget.ExtendBaseWidget(wid)
+}
+
 func (t *ToolTipWidget) SetToolTip(toolTip string) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
 	t.toolTip = toolTip
 }
 
 func (t *ToolTipWidget) ToolTip() string {
+	t.lock.Lock()
+	defer t.lock.Unlock()
 	return t.toolTip
 }
 
 func (t *ToolTipWidget) MouseIn(e *desktop.MouseEvent) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
-	t.absoluteMousePos = e.AbsolutePosition
-	t.setPendingToolTip(t, t.toolTip)
+	if t.toolTip != "" {
+		t.absoluteMousePos = e.AbsolutePosition
+		if t.wid == nil {
+			fyne.LogError("", errors.New("missing ExtendBaseWidget call for ToolTipWidget"))
+			return
+		}
+		t.setPendingToolTip(t.wid, t.toolTip)
+	}
 }
 
 func (t *ToolTipWidget) MouseOut() {
