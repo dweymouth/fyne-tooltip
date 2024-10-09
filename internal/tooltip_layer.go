@@ -69,6 +69,11 @@ func DestroyToolTipLayerForPopup(popUp *widget.PopUp) {
 }
 
 func ShowToolTipAtMousePosition(canvas fyne.Canvas, pos fyne.Position, text string) *ToolTipHandle {
+	if canvas == nil {
+		fyne.LogError("", errors.New("no canvas associated with tool tip widget"))
+		return nil
+	}
+
 	lastToolTipShownUnixMilli = time.Now().UnixMilli()
 	overlay := canvas.Overlays().Top()
 	handle := &ToolTipHandle{canvas: canvas, overlay: overlay}
