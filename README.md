@@ -92,7 +92,7 @@ import (
 
 type ToolTipIcon struct {
     widget.Icon
-    ttwidget.ToolTipWidget
+    ttwidget.ToolTipWidgetExtend
 }
 
 func NewToolTipIcon(resource fyne.Resource) *ToolTipIcon {
