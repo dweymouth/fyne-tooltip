@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"sync"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/theme"
@@ -10,10 +8,7 @@ import (
 	"github.com/dweymouth/fyne-tooltip/internal/shadow"
 )
 
-var (
-	ToolTipTextStyleMutex sync.Mutex
-	ToolTipTextStyle      = widget.RichTextStyle{SizeName: theme.SizeNameCaptionText}
-)
+var ToolTipTextStyle = widget.RichTextStyle{SizeName: theme.SizeNameCaptionText}
 
 type ToolTip struct {
 	widget.BaseWidget
@@ -49,9 +44,7 @@ func (t *ToolTip) TextMinSize() fyne.Size {
 }
 
 func (t *ToolTip) NonWrappingTextWidth() float32 {
-	ToolTipTextStyleMutex.Lock()
 	style := ToolTipTextStyle
-	ToolTipTextStyleMutex.Unlock()
 	th := t.Theme()
 	return fyne.MeasureText(t.Text, th.Size(style.SizeName), style.TextStyle).Width + th.Size(theme.SizeNameInnerPadding)*2
 }
@@ -61,9 +54,7 @@ func (t *ToolTip) updateRichText() {
 		t.richtext = widget.NewRichTextWithText(t.Text)
 		t.richtext.Wrapping = fyne.TextWrapWord
 	}
-	ToolTipTextStyleMutex.Lock()
 	style := ToolTipTextStyle
-	ToolTipTextStyleMutex.Unlock()
 	t.richtext.Segments[0].(*widget.TextSegment).Text = t.Text
 	t.richtext.Segments[0].(*widget.TextSegment).Style = style
 }

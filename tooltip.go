@@ -45,15 +45,11 @@ func DestroyPopUpToolTipLayer(p *widget.PopUp) {
 
 // SetToolTipTextStyle sets the TextStyle that will be used to render tool tip text.
 func SetToolTipTextStyle(style fyne.TextStyle) {
-	internal.ToolTipTextStyleMutex.Lock()
-	defer internal.ToolTipTextStyleMutex.Unlock()
 	internal.ToolTipTextStyle.TextStyle = style
 }
 
 // SetToolTipTextSizeName sets the theme size name that will control the size
 // of tool tip text. By default, tool tips use theme.SizeNameCaptionText.
 func SetToolTipTextSizeName(sizeName fyne.ThemeSizeName) {
-	internal.ToolTipTextStyleMutex.Lock()
-	defer internal.ToolTipTextStyleMutex.Unlock()
 	internal.ToolTipTextStyle.SizeName = sizeName
 }
