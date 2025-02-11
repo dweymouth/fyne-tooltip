@@ -3,7 +3,6 @@ package widget
 import (
 	"context"
 	"errors"
-	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -13,7 +12,6 @@ import (
 )
 
 type toolTipContext struct {
-	lock                 sync.Mutex
 	toolTipHandle        *internal.ToolTipHandle
 	absoluteMousePos     fyne.Position
 	pendingToolTipCtx    context.Context
@@ -37,20 +35,14 @@ func (t *ToolTipWidget) ExtendBaseWidget(wid fyne.Widget) {
 }
 
 func (t *ToolTipWidget) SetToolTip(toolTip string) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	t.toolTip = toolTip
 }
 
 func (t *ToolTipWidget) ToolTip() string {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	return t.toolTip
 }
 
 func (t *ToolTipWidget) MouseIn(e *desktop.MouseEvent) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	if t.toolTip != "" {
 		t.absoluteMousePos = e.AbsolutePosition
 		if t.wid == nil {
@@ -62,14 +54,10 @@ func (t *ToolTipWidget) MouseIn(e *desktop.MouseEvent) {
 }
 
 func (t *ToolTipWidget) MouseOut() {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	t.cancelToolTip()
 }
 
 func (t *ToolTipWidget) MouseMoved(e *desktop.MouseEvent) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	t.absoluteMousePos = e.AbsolutePosition
 }
 
@@ -87,14 +75,10 @@ type ToolTipWidgetExtend struct {
 }
 
 func (t *ToolTipWidgetExtend) SetToolTip(toolTip string) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	t.toolTip = toolTip
 }
 
 func (t *ToolTipWidgetExtend) ToolTip() string {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	return t.toolTip
 }
 
@@ -104,8 +88,6 @@ func (t *ToolTipWidgetExtend) ExtendToolTipWidget(wid fyne.Widget) {
 }
 
 func (t *ToolTipWidgetExtend) MouseIn(e *desktop.MouseEvent) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	if t.toolTip != "" {
 		t.absoluteMousePos = e.AbsolutePosition
 		t.setPendingToolTip(t.Obj, t.toolTip)
@@ -113,14 +95,10 @@ func (t *ToolTipWidgetExtend) MouseIn(e *desktop.MouseEvent) {
 }
 
 func (t *ToolTipWidgetExtend) MouseOut() {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	t.cancelToolTip()
 }
 
 func (t *ToolTipWidgetExtend) MouseMoved(e *desktop.MouseEvent) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
 	t.absoluteMousePos = e.AbsolutePosition
 }
 
@@ -134,14 +112,17 @@ func (t *toolTipContext) setPendingToolTip(wid fyne.CanvasObject, toolTipText st
 		case <-ctx.Done():
 			return
 		default:
-			t.lock.Lock()
-			defer t.lock.Unlock()
 			t.cancelToolTip() // don't leak ctx resources
-			pos := t.absoluteMousePos
-			canvas := fyne.CurrentApp().Driver().CanvasForObject(wid)
-			t.toolTipHandle = internal.ShowToolTipAtMousePosition(canvas, pos, toolTipText)
+			fyne.Do(func() {
+				t.showToolTip(wid, toolTipText)
+			})
 		}
 	}()
+}
+
+func (t *toolTipContext) showToolTip(wid fyne.CanvasObject, toolTipText string) {
+	canvas := fyne.CurrentApp().Driver().CanvasForObject(wid)
+	t.toolTipHandle = internal.ShowToolTipAtMousePosition(canvas, t.absoluteMousePos, toolTipText)
 }
 
 func (t *toolTipContext) cancelToolTip() {
