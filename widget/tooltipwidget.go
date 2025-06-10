@@ -112,8 +112,8 @@ func (t *toolTipContext) setPendingToolTip(wid fyne.CanvasObject, toolTipText st
 		case <-ctx.Done():
 			return
 		default:
-			t.cancelToolTip() // don't leak ctx resources
 			fyne.Do(func() {
+				t.cancelToolTip() // don't leak ctx resources
 				t.showToolTip(wid, toolTipText)
 			})
 		}
