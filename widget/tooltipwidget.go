@@ -106,8 +106,9 @@ func (t *toolTipContext) setPendingToolTip(wid fyne.CanvasObject, toolTipText st
 	ctx, cancel := context.WithCancel(context.Background())
 	t.pendingToolTipCtx, t.pendingToolTipCancel = ctx, cancel
 
+	delay := internal.NextToolTipDelayTime()
 	go func() {
-		<-time.After(internal.NextToolTipDelayTime())
+		<-time.After(delay)
 		select {
 		case <-ctx.Done():
 			return
