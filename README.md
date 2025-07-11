@@ -9,6 +9,15 @@ https://github.com/user-attachments/assets/e9a2b9dd-9d6c-49f2-9c3a-b896fec4609d
 
 Tool tip widgets implement `desktop.Hoverable` to show the tool tips after a short delay on MouseIn, and hide them on MouseOut.
 
+## Contents
+
+- [Enabling tool tips in a window](#enabling-tool-tips-in-a-window)
+- [Using built-in tool tip widgets](#using-built-in-tool-tip-widgets)
+- [Enabling tool tips in a PopUp](#enabling-tool-tips-in-a-popup)
+- [Creating new tool tip widgets](#creating-new-tool-tip-widgets)
+- [Extending existing widgets for tool tip support](#extending-existing-widgets-for-tool-tip-support)
+- [Example app](#example-app)
+
 ## Enabling tool tips in a window
 
 **fyne-tooltip** requires tool tip layers to be created for the tool tips to be rendered into, and provides APIs to do so for windows and pop-ups. It is called when setting the window's content:
@@ -76,6 +85,25 @@ func NewMyWidget() *MyWidget {
     w := &MyWidget{}
     w.ExtendBaseWidget(w)
     return w
+}
+```
+
+If your custom widget implements `desktop.Hoverable`, e.g. to make it tappable, you must also forward calls to `ToolTipWidget` in your overriden methods to enable tooltips to work. Here is an example for how this could be implemented:
+
+```go
+func (w *CustomWidget) MouseIn(e *desktop.MouseEvent) {
+	w.ToolTipWidgetExtend.MouseIn(e)
+	// custom logic
+}
+
+func (w *CustomWidget) MouseMoved(e *desktop.MouseEvent) {
+	w.ToolTipWidgetExtend.MouseMoved(e)
+    // custom logic
+}
+
+func (w *CustomWidget) MouseOut() {
+	w.ToolTipWidgetExtend.MouseOut()
+	// custom logic
 }
 ```
 
