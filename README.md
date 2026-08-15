@@ -139,17 +139,17 @@ If your custom widget implements `desktop.Hoverable`, e.g. to make it tappable, 
 
 ```go
 func (w *CustomWidget) MouseIn(e *desktop.MouseEvent) {
-	w.ToolTipWidgetExtend.MouseIn(e)
+	w.ToolTipWidget.MouseIn(e)
 	// custom logic
 }
 
 func (w *CustomWidget) MouseMoved(e *desktop.MouseEvent) {
-	w.ToolTipWidgetExtend.MouseMoved(e)
+	w.ToolTipWidget.MouseMoved(e)
     // custom logic
 }
 
 func (w *CustomWidget) MouseOut() {
-	w.ToolTipWidgetExtend.MouseOut()
+	w.ToolTipWidget.MouseOut()
 	// custom logic
 }
 ```
